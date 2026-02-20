@@ -1,0 +1,29 @@
+{% extends "htmls/base.html" %}
+{% block libraries %}
+	<link href="/js/libraries/codemirror/{{domain.libs.codemirror}}/codemirror.css" rel="stylesheet" type="text/css"/>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/codemirror.js"></script>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/css.js"></script>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/htmlmixed.js"></script>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/javascript.js"></script>
+{% endblock %}
+{% block body %}
+	<div id="code"></div>
+	<div id="execute" class="button button-block" onclick="execute()">Execute!</div>
+	<div id="result" style='margin-top: 10px'></div>
+	<style>
+		.CodeMirror{
+			font-family: Pixel;
+			font-size: 24px;
+			letter-spacing: 1px; /* more readable */
+			margin-bottom: 10px;
+		}
+	</style>
+	<script>
+		var editor=CodeMirror($("#code")[0],{lineNumbers:true,mode:"javascript",value:"api_call('get_lotteries',{}).then(function(response){\n\t$('#result').html('<pre>'+JSON.stringify(response,'\\t',2)+'</pre>');\n})"});
+		function execute()
+		{
+			$("body").append("<script>"+editor.getValue()+"<\/script>");
+		}
+		setTimeout(function(){ editor.setCursor({line:3,ch:0}); editor.focus(); },100);
+	</script>
+{% endblock %}

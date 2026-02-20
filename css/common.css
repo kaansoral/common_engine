@@ -1,0 +1,63 @@
+.clickable,.button[onclick]{
+	cursor:pointer;
+}
+.mt4{margin-top: 4px;}
+.mt10{margin-top: 10px;}
+.mb40{margin-bottom: 40px;}
+.mt20{margin-top: 20px;}
+.mt30{margin-top: 30px;}
+.mt40{margin-top: 40px;}
+.mb10{margin-bottom: 20px;}
+.mb20{margin-bottom: 20px;}
+.button{
+	display: inline-block;
+	border: 4px solid gray;
+	font-size: 24px;
+	line-height: 24px;
+	padding: 12px;
+	background: black;
+	text-align: center;
+	color: white;
+	margin: 2px;
+}
+.button+.button{
+	margin-left: 5px;
+}
+.blockbutton{
+	display: block;
+	border: 4px solid gray;
+	font-size: 24px;
+	line-height: 24px;
+	padding: 12px;
+	background: black;
+	text-align: center;
+}
+a.textbutton{
+	color: inherit;
+	text-decoration:none;
+}
+a.button{
+	color: inherit;
+	text-decoration:none;
+}
+
+.input{
+	padding: 20px;
+	font-size: 18px;
+}
+
+.input{
+	border:none !important;
+}
+.selectioninput{
+	font-size: 24px;
+	padding: 2px;
+	font-family: pixel;
+	text-align: center;
+}
+.selectiontextarea{
+	font-size: 24px;
+	padding: 2px;
+	font-family: pixel;
+	text-align: left;
+}

@@ -1,0 +1,43 @@
+{% extends "htmls/base.html" %}
+{% block libraries %}
+	<link href="/js/libraries/codemirror/{{domain.libs.codemirror}}/codemirror.css" rel="stylesheet" type="text/css"/>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/codemirror.js"></script>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/css.js"></script>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/htmlmixed.js"></script>
+	<script src="/js/libraries/codemirror/{{domain.libs.codemirror}}/javascript.js"></script>
+{% endblock %}
+{% block body %}
+	<div id="code"></div>
+	<div id="execute" class="button button-block btn btn-primary" onclick="execute()">Execute!</div>
+	<div id="result" style='margin-top: 10px'></div>
+	<style>
+		.CodeMirror{
+			font-family: Pixel;
+			font-size: 24px;
+			letter-spacing: 1px; /* more readable */
+			margin-bottom: 10px;
+		}
+	</style>
+	<script>
+		var editor=CodeMirror($("#code")[0],{lineNumbers:true,mode:"javascript",value:"var user=await get_user(req);\nvar domain=await get_domain(req);\n"});
+		function execute()
+		{
+			api_call('execute',{code:editor.getValue()}).then(function(r){
+				var html="",s=false;
+				if(r.logs) html+="<div>[LOGS]</div>"+r.logs,s=true;
+				if(r.output!==undefined) html+="<div>[OUTPUT]</div>"+r.output,s=true;
+				if(r.inspect)
+				{
+					html+="<div>[INSPECT]</div>";
+					html+="<pre>"+JSON.stringify(r.inspect,"\t",2)+"</pre>";
+					s=true;
+				}
+				if(r.error) html+="<div>[ERROR]</div>"+r.error,s=true;
+				if(!s) html+="[NO OUTPUT]";
+				html+="<div>[TIME]</div>"+(new Date());
+				$("#result").html(html);
+			});
+		}
+		setTimeout(function(){ editor.setCursor({line:3,ch:0}); editor.focus(); },100);
+	</script>
+{% endblock %}
