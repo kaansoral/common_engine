@@ -1,5 +1,5 @@
 function is_admin(user) {
-	if (Local) return true;
+	if (Local && options.unsecure_admin) return true;
 	if (user && user.admin) return true;
 	return false;
 }
