@@ -1,5 +1,5 @@
 function is_admin(user) {
-	if (Dev) return true;
+	if (Local) return true;
 	if (user && user.admin) return true;
 	return false;
 }
@@ -27,7 +27,9 @@ app.get("/admin/renderer", async (req, res, next) => {
 });
 
 app.get("/admin/make/user/admin", async (req, res, next) => {
-	if (!Dev) return;
+	if (!Local) return res.status(403).send("");
+	var ip = req.socket.remoteAddress;
+	if (ip !== "127.0.0.1" && ip !== "::1" && ip !== "::ffff:127.0.0.1") return res.status(403).send("");
 	var user = await get_user(req);
 	if (user) {
 		user.admin = true;
