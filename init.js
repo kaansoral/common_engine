@@ -5,10 +5,7 @@ var Local = (!process.env.GAE_APPLICATION && true) || false;
 var Prod = Project.indexOf("-dev") == -1;
 var Staging = !Local && !Prod;
 var Dev = !Prod;
-var Location =
-	process.env.REGION ||
-	((Dev || (process.env.GAE_APPLICATION && process.env.GAE_APPLICATION.indexOf("e~") != -1)) && "europe-west1") ||
-	"us-central1";
+var Location = process.env.REGION || ((Dev || (process.env.GAE_APPLICATION && process.env.GAE_APPLICATION.indexOf("e~") != -1)) && "europe-west1") || "us-central1";
 
 function reinit_from_options() {
 	Project = options.project_name;
@@ -63,7 +60,7 @@ var rawBodySaver = function (req, res, buf, encoding) {
 				req.query = JSON.parse(req.rawBody);
 			}
 		} catch (e) {
-			console.error("#R: " + e);
+			console.error("#rawBodySaver in init.js: " + e);
 		}
 	}
 };
@@ -103,24 +100,7 @@ if (Engine == "appengine") {
 	tasks = new CloudTasksClient();
 } else if (Engine == "mongodb") {
 	MongoClient = require("mongodb").MongoClient;
-	client = new MongoClient(
-		"mongodb://" +
-			keys.mongodb_user +
-			":" +
-			keys.mongodb_password +
-			"@" +
-			keys.mongodb_ip +
-			":" +
-			keys.mongodb_port +
-			"/" +
-			keys.mongodb_name +
-			"?authSource=" +
-			keys.mongodb_auth_source,
-		{
-			tls: true,
-			tlsCAFile: keys.mongodb_ca_file,
-		},
-	);
+	client = new MongoClient(keys.mongodb_uri, { tlsCAFile: keys.mongodb_ca_file });
 	client.connect();
 	db = client.db(keys.mongodb_name);
 }
