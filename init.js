@@ -100,7 +100,7 @@ if (Engine == "appengine") {
 	tasks = new CloudTasksClient();
 } else if (Engine == "mongodb") {
 	MongoClient = require("mongodb").MongoClient;
-	client = new MongoClient(keys.mongodb_uri, { tlsCAFile: keys.mongodb_ca_file });
+	client = new MongoClient(keys.mongodb_uri, keys.mongodb_config);
 	client.connect();
 	db = client.db(keys.mongodb_name);
 }
