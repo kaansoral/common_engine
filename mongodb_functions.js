@@ -56,6 +56,8 @@ function post_process_query_results(results) {
 
 async function tx(F, A, tries = 1, backoff = INITIAL_BACKOFF) {
 	var R = { failed: false, success: true };
+	var tx_caller = new Error().stack;
+	var tx_body = F.toString().slice(0, 200);
 	for (let attempt = 1; attempt <= tries; attempt++) {
 		try {
 			try {
@@ -63,9 +65,7 @@ async function tx(F, A, tries = 1, backoff = INITIAL_BACKOFF) {
 					ex_reason = null;
 				async function tx_save(entity, kind) {
 					if (entity.updated) entity.updated = new Date();
-					await db
-						.collection(kind || get_kind(entity))
-						.replaceOne({ _id: entity._id }, entity, { upsert: true, session });
+					await db.collection(kind || get_kind(entity)).replaceOne({ _id: entity._id }, entity, { upsert: true, session });
 					return true;
 				}
 				function ex(reason) {
@@ -86,10 +86,12 @@ async function tx(F, A, tries = 1, backoff = INITIAL_BACKOFF) {
 
 				return R;
 			} catch (e) {
-				if (!ex_reason) console.error(e);
 				await session.abortTransaction();
 				await session.endSession();
 				if (ex_reason) return { failed: true, reason: ex_reason };
+				if (e.code === 112) console.warn("#TX WriteConflict:", tx_body);
+				else console.log("#TX Transaction error:", e, "\n  callback:", tx_body, "\n  caller:", tx_caller);
+				if (attempt < tries) throw e;
 				return { failed: true, reason: "exception" };
 			}
 		} catch (err) {
@@ -97,12 +99,12 @@ async function tx(F, A, tries = 1, backoff = INITIAL_BACKOFF) {
 
 			if (attempt === tries) {
 				// || !isRetryable) {
-				console.error(`Transaction failed after ${attempt} attempts`, err);
+				console.log(`#TX Transaction failed after ${attempt} attempts`, err, "\n  callback:", tx_body, "\n  caller:", tx_caller);
 				throw err;
 			}
 
 			const delay = Math.min(backoff * Math.pow(BACKOFF_MULTIPLIER, attempt - 1), 20 * 60 * 1000);
-			console.warn(`Transaction failed (attempt ${attempt}), retrying in ${delay}ms...`);
+			console.log(`Transaction failed (attempt ${attempt}), retrying in ${delay}ms...`);
 			await new Promise((res) => setTimeout(res, delay));
 		}
 	}
