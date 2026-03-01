@@ -60,7 +60,7 @@ var rawBodySaver = function (req, res, buf, encoding) {
 				req.query = JSON.parse(req.rawBody);
 			}
 		} catch (e) {
-			console.error("#rawBodySaver in init.js: " + e);
+			if (Dev) console.warn("#rawBodySaver in init.js:", req.method, req.originalUrl, e);
 		}
 	}
 };
@@ -89,6 +89,7 @@ app.use(
 		type: function () {
 			return true;
 		},
+		limit: "5mb",
 	}),
 );
 
